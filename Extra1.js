@@ -1,36 +1,39 @@
 const inquirer = require("inquirer")
 const {telaInicial, cadastrar, buscar } = require("./atendimento")
+const fs = require('fs')
 
 //metodo construtor
-function Cadastro(identificador, nomePet, raca, nomeDono){
-    this.identificador = identificador,
-    this.nomePet = nomePet,
+function Cadastro(nomePet, raca, nomeDono, identificador){
+    this.nome = nomePet,
     this.raca = raca,
     this.nomeDono = nomeDono,
-    this.viraJSON = () => JSON.stringify(this) 
+    this.identificador = identificador  //identificador baseado no length da base de dados
 }
 
 
 //chama a pergunta inicial
 inquirer.prompt(telaInicial).then((resposta) =>{
     let opcao = resposta.opcao
-    //base de dados com alguns cadastros ja em formato JSON para conseguir pesquisar e mostra uma lista mais completa.
-    let baseDados = ['{"nome":"Billy","raca":"beagle","nomeDono":"Bibi","identificador":0}',
-    '{"nome":"Jurema","raca":"gato","nomeDono":"Bruney","identificador":1}','{"nome":"Lilith","raca":"gato","nomeDono":"Kikki","identificador":2}']
+    
+    //armazena a base de dados para poder trabalhar
+    let baseVinda = []
+    baseVinda = JSON.parse(fs.readFileSync('Data_Base.json','utf-8'));
 
     //escolheu a acao: Cadastrar novo pet
     if (opcao === 0) {
         inquirer.prompt(cadastrar).then(infoCadastro => {
-        infoCadastro.identificador = baseDados.length
-        console.log(`As informacoes do cadastro são`, JSON.stringify(infoCadastro));
-        baseDados.push(JSON.stringify(infoCadastro))
-        console.log(baseDados)
+        let novoPet = new Cadastro(infoCadastro.nome, infoCadastro.raca, infoCadastro.nomeDono, baseVinda.length)
+        baseVinda.push(novoPet)
+        fs.writeFileSync('Data_Base.json', JSON.stringify(baseVinda), 'utf-8')
+        console.log(`Dados cadastrados com sucesso!`)  //eu deveria printar Cadastro(?)
+        console.log(novoPet)
         })
     }  
     
     //escolheu a acao: listar todos os pets
     if (opcao === 1) {
-        console.log(baseDados);
+        const data = fs.readFileSync('Data_Base.json','utf-8');
+        console.log(data)
     }
 
     //escolheu a acao: buscar pet por nome
@@ -38,8 +41,8 @@ inquirer.prompt(telaInicial).then((resposta) =>{
         inquirer.prompt(buscar).then(pesquisa => {      
 
             //base de dados em formato JSON precisa virar objeto 
-            for (hash in baseDados){
-                let verificar = JSON.parse(baseDados[hash])
+            for (hash in baseVinda){
+                let verificar = baseVinda[hash]
 
                 //verificando se o nome da pesquisa bate com o nome do cadastro
                 if (verificar.nome == pesquisa.nomeBusca){
