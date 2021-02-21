@@ -4,6 +4,7 @@ Desafio extra 01
 O objetivo desse desafio é criar o controle de um Petshop.
 1-Criar um método construtor para criar novos pets(animais).Esse objeto deve conter os atributos: Identificador, Nome do PET, raça, nome do dono. (500 pontos)
 2-Solicitar ao usuário o que ele quer fazer(utilizando o inquirer).As opções são listadas abaixo (500 pontos):
+
 ●Cadastrar novo pet
 ●Listar todos os pets cadastrados
 ●Buscar pet por nome
